@@ -267,8 +267,8 @@ footer small{display:block;margin-top:7px;color:var(--tinta);font-size:12.5px;le
 /* ---- Configuración: pega aquí los dos valores de tu proyecto
    (Supabase → Project Settings → API). La anon key es pública por
    diseño; quién entra lo deciden las políticas de la base. ---- */
-const SUPABASE_URL  = "PEGA_AQUI_TU_URL";       // https://xxxxxxxx.supabase.co
-const SUPABASE_ANON = "PEGA_AQUI_TU_ANON_KEY";
+const SUPABASE_URL  = "https://istfqqmuxcuhduakrojo.supabase.co";       // https://xxxxxxxx.supabase.co
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzdGZxcW11eGN1aGR1YWtyb2pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1MDgxNDQsImV4cCI6MjEwMTA4NDE0NH0.vWmIXGut_TO0Azw3VpYad0cG-pil5eVu9EsUiOq1NFc";
 
 /* ---- Constantes de la aplicación ---- */
 const RESP = { hector:"Héctor", juan:"Juan", ambos:"Héctor y Juan", tercero:"Cliente o tercero" };
@@ -298,21 +298,21 @@ async function guardar(t){
   TAREAS = TAREAS.filter(x=>x.id!==t.id).concat([t]);
   pintar();
   if(!SB) return;
-  const {error} = await SB.from("tareas").upsert(t);
+  const {error} = await SB.from("tg2g_tareas").upsert(t);
   if(error) setCon("off","No se pudo guardar: "+error.message);
 }
 async function borrar(id){
   TAREAS = TAREAS.filter(x=>x.id!==id);
   pintar();
   if(!SB) return;
-  const {error} = await SB.from("tareas").delete().eq("id", id);
+  const {error} = await SB.from("tg2g_tareas").delete().eq("id", id);
   if(error) setCon("off","No se pudo eliminar: "+error.message);
 }
 async function cargarTodo(){
   const [c, t, p] = await Promise.all([
-    SB.from("cuentas").select("*").order("orden"),
-    SB.from("tareas").select("*").limit(2000),
-    SB.from("plan_semana").select("*").order("orden")
+    SB.from("tg2g_cuentas").select("*").order("orden"),
+    SB.from("tg2g_tareas").select("*").limit(2000),
+    SB.from("tg2g_plan_semana").select("*").order("orden")
   ]);
   if(c.error || t.error || p.error){
     setCon("off","Error al leer: "+((c.error||t.error||p.error).message));
@@ -332,7 +332,7 @@ async function cargarTodo(){
 }
 function escuchar(){
   SB.channel("tablero-g2g")
-    .on("postgres_changes", { event:"*", schema:"public", table:"tareas" }, cargarTodo)
+    .on("postgres_changes", { event:"*", schema:"public", table:"tg2g_tareas" }, cargarTodo)
     .subscribe(st => { if(st === "SUBSCRIBED") setCon("on","Sincronizado"); });
 }
 
